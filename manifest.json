@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Threads Pro ZIP",
+  "name": "Threads Pro Downloader",
   "version": "3.2",
   "permissions": [
     "activeTab",
-    "downloads",
+    "offscreen",
     "storage",
     "webRequest"
   ],
@@ -15,10 +15,10 @@
     "https://*.cdninstagram.com/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background/background.js"
   },
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
