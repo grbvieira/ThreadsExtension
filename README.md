@@ -2,6 +2,12 @@
 
 Extensao Chrome MV3 para baixar imagens e videos de perfis do Threads a partir das requisicoes GraphQL feitas pela propria pagina.
 
+## Aviso
+
+Este projeto e apenas educacional. Use por sua propria conta e risco, respeitando os termos de uso do Threads, direitos autorais, privacidade e legislacao aplicavel.
+
+Os autores e colaboradores nao se responsabilizam por uso indevido, bloqueios de conta, perda de dados, violacao de termos de servico ou qualquer outro dano direto ou indireto causado pelo uso deste codigo.
+
 ## Recursos
 
 - Detecta a sessao ativa do Threads por meio de requisicoes GraphQL.
