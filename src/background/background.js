@@ -58,6 +58,7 @@ chrome.webRequest.onBeforeRequest.addListener(
           };
 
           chrome.storage.local.set({ session: capturedSession });
+          enrichCapturedSessionFromTab(details.tabId);
           chrome.action.setBadgeText({ text: "ON" });
           chrome.action.setBadgeBackgroundColor({ color: "#2196F3" });
         }
@@ -83,7 +84,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.action === "START_FILE_SYSTEM_DOWNLOAD") {
-    startDownload(request).then(sendResponse);
+    startDownload(request)
+      .then(sendResponse)
+      .catch((e) => {
+        const message = `Erro ao iniciar o offscreen: ${e.message || e}`;
+        updateStatus(message);
+        sendResponse({ ok: false, error: message });
+      });
     return true;
   }
 
@@ -197,14 +204,6 @@ function validateSessionForPage(session, pageUrl, username) {
   const currentUsername = sanitizeName(username, "").toLowerCase();
   const capturedUsername = sanitizeName(session.profileUsername || "", "").toLowerCase();
 
-  if (!capturedUsername) {
-    return {
-      ok: false,
-      error: "profile_unknown",
-      message: "Erro: não foi possível confirmar o perfil da sessão. Dê F5 no perfil atual e tente novamente."
-    };
-  }
-
   if (capturedUsername && currentUsername && capturedUsername !== currentUsername) {
     return {
       ok: false,
@@ -214,6 +213,24 @@ function validateSessionForPage(session, pageUrl, username) {
   }
 
   return { ok: true };
+}
+
+function enrichCapturedSessionFromTab(tabId) {
+  if (typeof tabId !== "number" || tabId < 0 || !chrome.tabs?.get) return;
+
+  chrome.tabs.get(tabId, (tab) => {
+    if (chrome.runtime.lastError || !tab?.url || !capturedSession) return;
+    if (!getOrigin(tab.url).includes("threads.")) return;
+
+    capturedSession = {
+      ...capturedSession,
+      sourceUrl: tab.url,
+      sourceOrigin: getOrigin(tab.url),
+      profileUsername: getUsernameFromUrl(tab.url, capturedSession.profileUsername || "")
+    };
+
+    chrome.storage.local.set({ session: capturedSession });
+  });
 }
 
 function updateStatus(msg, count = null) {
